@@ -34,3 +34,7 @@ repo:
 	LIMA_INSTANCE=dev lima git config --global user.email "mr.andrewsokolov@gmail.com"
 	LIMA_INSTANCE=dev lima mkdir /home/$USER/repos
 	LIMA_INSTANCE=dev lima git clone git@github.com:andrewsokolov/$(PROJECT_NAME).git /home/ubuntu/repos/$(PROJECT_NAME)
+
+
+vscode:
+	@echo 'add to vscode settings: "remote.SSH.configFile": "/home/deck/.lima/dev/ssh.config"'
