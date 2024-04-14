@@ -8,7 +8,9 @@ start:
 	limactl start template://archlinux --name dev
 
 init:
+	lima sudo pacman -Syu --noconfirm
 	lima sudo pacman-key --init
+	lima sudo pacman -S --noconfirm archlinux-keyring
 	lima sudo pacman-key --populate archlinux
 	lima sudo pacman -Syu
 	lima sudo pacman -S --noconfirm git wget docker zsh make nano
