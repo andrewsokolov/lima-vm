@@ -1,35 +1,47 @@
-INSTANCE_NAME = dev
-SSH_KEY_NAME = id_ed25519
-PROJECT_NAME = scylla-project
-LIMA_INSTANCE = dev
+INSTANCE_NAME=dev
+SSH_KEY_NAME=id_ed25519
+PROJECT_NAME=scylla-project
+LIMA_INSTANCE=dev2
+LIMA_SHELL=/bin/zsh
 export LIMA_INSTANCE
+export LIMA_SHELL
+
+HOME_DIR := $(shell if [ -d "/Users" ]; then echo "/Users"; else echo "/home"; fi)
 
 start:
 	limactl start template://archlinux --name dev
 
 init:
-	lima sudo pacman -Syu --noconfirm
 	lima sudo pacman-key --init
 	lima sudo pacman -S --noconfirm archlinux-keyring
 	lima sudo pacman-key --populate archlinux
-	lima sudo pacman -Syu
-	lima sudo pacman -S --noconfirm git wget docker zsh make nano
-	lima sh -c "$$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || true
-	lima sh -c "sudo chsh -s $$(which zsh) $$USER"
+	lima sudo pacman -Syu --noconfirm
+	lima sudo pacman -S --noconfirm git wget docker zsh make nano which
+	lima sh -c "$$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh) --unattended"
+
 	lima sh -c "mkdir -p ~/.ssh"
-	lima cp /home/deck/.ssh/id_rsa /home/deck.linux/.ssh/id_rsa
-	lima cp /home/deck/.ssh/id_rsa.pub /home/deck.linux/.ssh/id_rsa.pub
+
+	lima sh -c 'if [ -f "$(HOME_DIR)/$$USER/.ssh/id_rsa" ]; then \
+		cp $(HOME_DIR)/$$USER/.ssh/id_rsa ~/.ssh/id_rsa; \
+		cp $(HOME_DIR)/$$USER/.ssh/id_rsa.pub ~/.ssh/id_rsa.pub; \
+	else  \
+		echo "$(HOME_DIR)/$$USER/.ssh/id_rsa not found"; \
+	fi'
+
+	lima sh -c 'if [ -f "$(HOME_DIR)/$$USER/.ssh/id_ed25519" ]; then \
+		cp $(HOME_DIR)/$$USER/.ssh/id_ed25519 ~/.ssh/id_ed25519; \
+		cp $(HOME_DIR)/$$USER/.ssh/id_ed25519.pub ~/.ssh/id_ed25519.pub; \
+	else  \
+		echo "$(HOME_DIR)/$$USER/.ssh/id_ed25519 not found"; \
+	fi'
+
 	lima sudo systemctl start docker.service
 	lima sudo systemctl enable docker.service
 	lima sh -c "sudo usermod -aG docker $$USER"
 	lima sh -c "sudo chmod 666 /var/run/docker.sock"
 
-	lima sh -c 'if ! grep -q "cd ~/repos/$(PROJECT_NAME)" ~/.bashrc; then \
-        echo "cd ~/repos/$(PROJECT_NAME)" >> ~/.bashrc; \
-    fi'
-
-	lima sh -c 'if ! grep -q "source ~/.bashrc" ~/.zshrc; then \
-        echo "source ~/.bashrc" >> ~/.zshrc; \
+	lima sh -c 'if ! grep -q "cd ~/repos/$(PROJECT_NAME)" ~/.zshrc; then \
+        echo "cd ~/repos/$(PROJECT_NAME)" >> ~/.zshrc; \
     fi'
 
 repo:
@@ -42,4 +54,4 @@ shell:
 	@lima
 	
 vscode:
-	@echo 'add to vscode settings: "remote.SSH.configFile": "/home/deck/.lima/dev/ssh.config"'
+	@echo 'add to vscode settings: "remote.SSH.configFile": "$(HOME_DIR)/$(USER)/.lima/dev/ssh.config"'
