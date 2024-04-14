@@ -16,7 +16,7 @@ init:
 	lima sudo pacman -S --noconfirm archlinux-keyring
 	lima sudo pacman-key --populate archlinux
 	lima sudo pacman -Syu --noconfirm
-	lima sudo pacman -S --noconfirm git wget docker docker-compose zsh make nano which
+	lima sudo pacman -S --noconfirm git wget docker docker-compose zsh make nano which htop go
 	lima sh -c "$$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh) --unattended" || true
 
 	lima sh -c "mkdir -p ~/.ssh"
