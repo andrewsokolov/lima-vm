@@ -1,7 +1,7 @@
 INSTANCE_NAME=dev
 SSH_KEY_NAME=id_ed25519
 PROJECT_NAME=scylla-project
-LIMA_INSTANCE=dev2
+LIMA_INSTANCE=dev
 LIMA_SHELL=/bin/zsh
 export LIMA_INSTANCE
 export LIMA_SHELL
@@ -16,8 +16,8 @@ init:
 	lima sudo pacman -S --noconfirm archlinux-keyring
 	lima sudo pacman-key --populate archlinux
 	lima sudo pacman -Syu --noconfirm
-	lima sudo pacman -S --noconfirm git wget docker zsh make nano which
-	lima sh -c "$$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh) --unattended"
+	lima sudo pacman -S --noconfirm git wget docker docker-compose zsh make nano which
+	lima sh -c "$$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh) --unattended" || true
 
 	lima sh -c "mkdir -p ~/.ssh"
 
