@@ -2,21 +2,21 @@ INSTANCE_NAME=dev
 SSH_KEY_NAME=id_ed25519
 PROJECT_NAME=scylla-project
 LIMA_INSTANCE=dev
-LIMA_SHELL=/bin/zsh
 export LIMA_INSTANCE
-export LIMA_SHELL
 
 HOME_DIR := $(shell if [ -d "/Users" ]; then echo "/Users"; else echo "/home"; fi)
 
-start:
-	limactl start template://archlinux --name dev
+create:
+	curl https://raw.githubusercontent.com/lima-vm/lima/master/examples/fedora.yaml -o /tmp/lima-vm-fedora.yaml
+	docker run --rm -v /tmp:/workdir mikefarah/yq e '.ssh.localPort = 5050' -i /workdir/lima-vm-fedora.yaml
+	limactl create --name=dev /tmp/lima-vm-fedora.yaml
 
 init:
-	lima sudo pacman-key --init
-	lima sudo pacman -S --noconfirm archlinux-keyring
-	lima sudo pacman-key --populate archlinux
-	lima sudo pacman -Syu --noconfirm
-	lima sudo pacman -S --noconfirm git wget docker docker-compose zsh make nano which htop go
+	lima sudo dnf update -y
+	lima sudo dnf -y install dnf-plugins-core
+	lima sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+	lima sudo dnf install -y docker-ce docker-ce-cli docker-buildx-plugin docker-compose-plugin --allowerasing
+	lima sudo dnf install -y git wget zsh make nano which htop go
 	lima sh -c "$$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh) --unattended" || true
 
 	lima sh -c "mkdir -p ~/.ssh"
@@ -51,7 +51,7 @@ repo:
 	lima sh -c "git clone git@github.com:andrewsokolov/$(PROJECT_NAME).git ~/repos/$(PROJECT_NAME) || true"
 
 shell:
-	@lima
+	@LIMA_SHELL=/bin/zsh lima
 	
 vscode:
 	@echo 'add to vscode settings: "remote.SSH.configFile": "$(HOME_DIR)/$(USER)/.lima/dev/ssh.config"'
