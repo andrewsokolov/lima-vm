@@ -7,9 +7,10 @@ export LIMA_INSTANCE
 HOME_DIR := $(shell if [ -d "/Users" ]; then echo "/Users"; else echo "/home"; fi)
 
 create:
-	curl https://raw.githubusercontent.com/lima-vm/lima/master/examples/fedora.yaml -o /tmp/lima-vm-fedora.yaml
-	docker run --rm -v /tmp:/workdir mikefarah/yq e '.ssh.localPort = 5050' -i /workdir/lima-vm-fedora.yaml
-	limactl create --name=dev /tmp/lima-vm-fedora.yaml
+	mkdir -p .tmp
+	curl https://raw.githubusercontent.com/lima-vm/lima/master/examples/fedora.yaml -o .tmp/lima-vm-fedora.yaml
+	docker run --rm -v ./:/workdir mikefarah/yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' /workdir/.tmp/lima-vm-fedora.yaml /workdir/vm-config.yaml | tee ./.tmp/lima-vm-fedora-modified.yaml
+	limactl create --name=dev ./.tmp/lima-vm-fedora-modified.yaml
 
 init:
 	lima sudo dnf update -y
@@ -55,3 +56,8 @@ shell:
 	
 vscode:
 	@echo 'add to vscode settings: "remote.SSH.configFile": "$(HOME_DIR)/$(USER)/.lima/dev/ssh.config"'
+
+tunnel:
+	lima docker run cloudflare/cloudflared:latest tunnel --no-autoupdate login
+	lima docker run cloudflare/cloudflared:latest tunnel --no-autoupdate create andrewsokolov
+
