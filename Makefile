@@ -52,6 +52,7 @@ repo:
 	lima sh -c "git clone git@github.com:andrewsokolov/$(PROJECT_NAME).git ~/repos/$(PROJECT_NAME) || true"
 
 shell:
+	limactl start dev
 	@LIMA_SHELL=/bin/zsh lima
 	
 vscode:
