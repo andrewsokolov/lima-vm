@@ -1,0 +1,13 @@
+# How to expose port
+
+1. Edit instance config: `limactl edit dev`
+2. add those lines:
+
+```
+portForwards:
+- guestPort: 8000  # or any port your service is running on
+  hostPort: 8000
+  hostIP: "0.0.0.0"  # Listen on all interfaces
+```
+
+3. Restart instance
