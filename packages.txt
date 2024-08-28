@@ -1,0 +1,6 @@
+git
+wget
+zsh
+make
+nano
+bat
