@@ -4,3 +4,5 @@ zsh
 make
 nano
 bat
+build-essential
+python3.12-dev

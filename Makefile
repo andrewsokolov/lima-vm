@@ -21,7 +21,7 @@ init:
 	git clone https://github.com/spaceship-prompt/spaceship-prompt.git "$$ZSH_CUSTOM/themes/spaceship-prompt" --depth=1 || true
 	ln -s "$$ZSH_CUSTOM/themes/spaceship-prompt/spaceship.zsh-theme" "$$ZSH_CUSTOM/themes/spaceship.zsh-theme" || true
 
-	sed -i 's/^ZSH_THEME="[^"]*"/ZSH_THEME="spaceship"/' ~/.zshrc
+	lima sh -c "sed -i 's/^ZSH_THEME=\"[^\"]*\"/ZSH_THEME=\""spaceship"\"/' ~/.zshrc"
 
 	curl -sSL https://install.python-poetry.org | python3 -
 
