@@ -5,21 +5,28 @@ LIMA_INSTANCE = dev
 export LIMA_INSTANCE
 
 HOME_DIR := $(shell if [ -d "/Users" ]; then echo "/Users"; else echo "/home"; fi)
+export HOME_DIR
+
+remove:
+	limactl rm $$LIMA_INSTANCE
 
 start:
-	limactl rm $$LIMA_INSTANCE
 	limactl start template://default --name $$LIMA_INSTANCE
 
 restart:	
 	limactl stop $$LIMA_INSTANCE || true
 	limactl start $$LIMA_INSTANCE
 
+test:
+	@./scripts/test.sh
+
 init:
+	@./scripts/init.sh
+
+old:
 	lima sudo apt update
 	lima sudo apt install -y $$(cat packages.txt)
 	lima sh -c "$$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh) --unattended" || true
-	git clone https://github.com/spaceship-prompt/spaceship-prompt.git "$$ZSH_CUSTOM/themes/spaceship-prompt" --depth=1 || true
-	ln -s "$$ZSH_CUSTOM/themes/spaceship-prompt/spaceship.zsh-theme" "$$ZSH_CUSTOM/themes/spaceship.zsh-theme" || true
 
 	lima sh -c "sed -i 's/^ZSH_THEME=\"[^\"]*\"/ZSH_THEME=\""spaceship"\"/' ~/.zshrc"
 
@@ -41,10 +48,6 @@ init:
 		echo "$(HOME_DIR)/$$USER/.ssh/id_ed25519 not found"; \
 	fi'
 
-	lima sh -c 'if ! grep -q "source $$(pwd)/.devrc" ~/.zshrc; then \
-        echo "source $$(pwd)/.devrc" >> ~/.zshrc; \
-    fi'
-
 repo:
 	lima git config --global user.name "Andrew Sokolov"
 	lima git config --global user.email "mr.andrewsokolov@gmail.com"
@@ -52,7 +55,6 @@ repo:
 	lima sh -c "git clone git@github.com:andrewsokolov/$(PROJECT_NAME).git ~/repos/$(PROJECT_NAME) || true"
 
 shell:
-	@@limactl copy spaceshiprc.zsh $$LIMA_INSTANCE:~/.spaceshiprc.zsh > /dev/null 2>&1
 	@limactl shell --shell zsh $$LIMA_INSTANCE 
 	
 vscode:
